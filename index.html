@@ -1,0 +1,434 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>FF RETRO PANEL</title>
+
+<style>
+*{
+    box-sizing:border-box;
+    margin:0;
+    padding:0;
+    font-family:monospace;
+}
+
+body{
+    min-height:100vh;
+    background:#050308;
+    color:#fff;
+    display:flex;
+    align-items:center;
+    justify-content:center;
+    overflow:hidden;
+}
+
+/* PAINEL */
+
+.panel{
+    width:350px;
+    max-width:92vw;
+    background:#0d0912;
+    border:2px solid #a855f7;
+    border-radius:12px;
+    box-shadow:
+        0 0 10px #7e22ce,
+        0 0 35px #4c1d95;
+    overflow:hidden;
+}
+
+/* CABEÇALHO */
+
+.header{
+    padding:16px;
+    text-align:center;
+    background:#170b22;
+    border-bottom:1px solid #a855f7;
+}
+
+.logo{
+    font-size:22px;
+    font-weight:bold;
+    color:#d8b4fe;
+}
+
+.sub{
+    margin-top:5px;
+    color:#777;
+    font-size:10px;
+}
+
+/* STATUS */
+
+.status{
+    padding:9px;
+    text-align:center;
+    color:#6eff9b;
+    font-size:11px;
+}
+
+/* CONTEÚDO */
+
+.content{
+    padding:12px;
+    max-height:72vh;
+    overflow-y:auto;
+}
+
+/* CARDS */
+
+.card{
+    background:#08060b;
+    border:1px solid #45205d;
+    border-radius:8px;
+    padding:12px;
+    margin-bottom:10px;
+}
+
+.title{
+    color:#c084fc;
+    font-weight:bold;
+    margin-bottom:10px;
+}
+
+.row{
+    display:flex;
+    justify-content:space-between;
+    align-items:center;
+    margin:9px 0;
+    font-size:12px;
+}
+
+.value{
+    color:#86efac;
+}
+
+/* BOTÕES */
+
+button{
+    width:100%;
+    padding:12px;
+    margin-top:7px;
+    background:#130a1b;
+    color:#fff;
+    border:1px solid #9333ea;
+    border-radius:7px;
+    font-weight:bold;
+    cursor:pointer;
+}
+
+button:active{
+    transform:scale(.98);
+}
+
+button.active{
+    background:#6b21a8;
+    box-shadow:0 0 12px #a855f7;
+}
+
+/* SLIDER */
+
+input[type="range"]{
+    width:100%;
+    accent-color:#a855f7;
+}
+
+/* FPS */
+
+.fps{
+    text-align:center;
+    font-size:38px;
+    font-weight:bold;
+    color:#67e8f9;
+    text-shadow:0 0 12px #06b6d4;
+}
+
+.fps small{
+    display:block;
+    color:#666;
+    font-size:10px;
+}
+
+/* BOTÃO FLUTUANTE */
+
+.float{
+    position:fixed;
+    right:18px;
+    bottom:18px;
+
+    width:60px;
+    height:60px;
+
+    border-radius:50%;
+
+    background:#6b21a8;
+    border:2px solid #d8b4fe;
+
+    box-shadow:0 0 20px #7e22ce;
+
+    font-size:15px;
+}
+
+/* RETÍCULO VISUAL */
+
+.crosshair{
+    position:fixed;
+    left:50%;
+    top:50%;
+
+    width:32px;
+    height:32px;
+
+    transform:translate(-50%,-50%);
+
+    display:none;
+    pointer-events:none;
+}
+
+.crosshair::before,
+.crosshair::after{
+    content:"";
+    position:absolute;
+    background:#fff;
+}
+
+.crosshair::before{
+    width:32px;
+    height:2px;
+    top:15px;
+}
+
+.crosshair::after{
+    width:2px;
+    height:32px;
+    left:15px;
+}
+
+.hidden{
+    display:none;
+}
+</style>
+</head>
+
+<body>
+
+<!-- PAINEL -->
+
+<div id="panel" class="panel">
+
+    <div class="header">
+
+        <div class="logo">
+            ◈ FF RETRO ◈
+        </div>
+
+        <div class="sub">
+            MOBILE EDITION
+        </div>
+
+    </div>
+
+    <div class="status">
+        ● SISTEMA LOCAL
+    </div>
+
+    <div class="content">
+
+        <!-- FPS -->
+
+        <div class="card">
+
+            <div class="title">
+                ▣ MONITOR FPS
+            </div>
+
+            <div class="fps">
+                <span id="fps">120</span>
+                <small>FPS VISUAL</small>
+            </div>
+
+            <button id="fpsBtn"
+                    onclick="fpsToggle()">
+                FPS MONITOR: ON
+            </button>
+
+        </div>
+
+        <!-- FOV -->
+
+        <div class="card">
+
+            <div class="title">
+                ◉ CAMPO DE VISÃO
+            </div>
+
+            <div class="row">
+                <span>FOV</span>
+
+                <b id="fovValue"
+                   class="value">
+                    90°
+                </b>
+            </div>
+
+            <input
+                type="range"
+                min="60"
+                max="120"
+                value="90"
+                oninput="changeFOV(this.value)"
+            >
+
+        </div>
+
+        <!-- HUD -->
+
+        <div class="card">
+
+            <div class="title">
+                🎯 HUD RETRÔ
+            </div>
+
+            <button onclick="reticle(this)">
+                RETÍCULO
+            </button>
+
+            <button onclick="toggle(this)">
+                FULL CAPA
+            </button>
+
+            <button onclick="toggle(this)">
+                TRIK
+            </button>
+
+        </div>
+
+        <!-- STATUS -->
+
+        <div class="card">
+
+            <div class="title">
+                ▣ STATUS
+            </div>
+
+            <div class="row">
+                <span>FPS</span>
+                <span id="statusFPS"
+                      class="value">
+                    120
+                </span>
+            </div>
+
+            <div class="row">
+                <span>FOV</span>
+                <span id="statusFOV"
+                      class="value">
+                    90°
+                </span>
+            </div>
+
+            <div class="row">
+                <span>Modo</span>
+                <span class="value">
+                    RETRO
+                </span>
+            </div>
+
+        </div>
+
+    </div>
+
+</div>
+
+<!-- RETÍCULO -->
+
+<div id="crosshair"
+     class="crosshair">
+</div>
+
+<!-- BOTÃO FLUTUANTE -->
+
+<button class="float"
+        onclick="panelToggle()">
+    FF
+</button>
+
+<script>
+
+/* FPS */
+
+let fpsEnabled=true;
+
+function fpsToggle(){
+
+    fpsEnabled=!fpsEnabled;
+
+    document.getElementById("fps")
+        .textContent =
+        fpsEnabled ? "120" : "--";
+
+    document.getElementById("statusFPS")
+        .textContent =
+        fpsEnabled ? "120" : "--";
+
+    document.getElementById("fpsBtn")
+        .textContent =
+        fpsEnabled
+        ? "FPS MONITOR: ON"
+        : "FPS MONITOR: OFF";
+}
+
+
+/* FOV */
+
+function changeFOV(value){
+
+    document.getElementById("fovValue")
+        .textContent=value+"°";
+
+    document.getElementById("statusFOV")
+        .textContent=value+"°";
+}
+
+
+/* BOTÕES */
+
+function toggle(button){
+
+    button.classList.toggle("active");
+}
+
+
+/* RETÍCULO */
+
+let reticleEnabled=false;
+
+function reticle(button){
+
+    reticleEnabled=!reticleEnabled;
+
+    button.classList.toggle(
+        "active",
+        reticleEnabled
+    );
+
+    document.getElementById("crosshair")
+        .style.display =
+        reticleEnabled
+        ? "block"
+        : "none";
+}
+
+
+/* PAINEL */
+
+function panelToggle(){
+
+    document.getElementById("panel")
+        .classList.toggle("hidden");
+}
+
+</script>
+
+</body>
+</html>
